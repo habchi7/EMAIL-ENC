@@ -1,15 +1,6 @@
 (function() {
     'use strict';
 
-    const stopTime = new Date("2028-10-01T18:48:00+01:00");
-
-    if (new Date() >= stopTime) {
-        return; 
-    }
-  
-/////////////////////////////////////////////////////////////////////////////////////
-    'use strict';
-
     // 🔹 Helpers
     function getActiveTabContent() {
         const tabAreas = document.querySelectorAll('div.sp-tab-area');
@@ -148,7 +139,4 @@
     }
 
     initializeScript();
-  
-/////////////////////////////////////////////////////////////////////////////////////
-  
 })();
