@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+
     // 🔹 Helpers
     function getActiveTabContent() {
         const tabAreas = document.querySelectorAll('div.sp-tab-area');
@@ -8,6 +9,7 @@
         }
         return null;
     }
+
     function extractInputData() {
         const activeTabContent = getActiveTabContent();
         if (!activeTabContent) return null;
@@ -18,6 +20,7 @@
             title: inputField.title
         } : null;
     }
+
     function getTotalRegle() {
         const activeTabContent = getActiveTabContent();
         if (!activeTabContent) return null;
@@ -31,6 +34,7 @@
         const montantInput = activeTabContent.querySelector('input.swtEditDisabled.swtEditDisabledTheme.s_c_r');
         return montantInput ? montantInput.value.trim() : null;
     }
+
     // 🔹 Create button
     function createButton() {
         let btn = document.createElement("button");
@@ -52,40 +56,43 @@
         });
         return btn;
     }
+
     // 🔹 Insert button in toolbar
     function insertButton(btn) {
         const toolbar = document.querySelector('div.sp-fstd-black.s_pa.sp-toolbar-ext ul.sp-toolbar');
         if (!toolbar) return false;
         const lastListItem = toolbar.querySelector('li:last-child');
         if (lastListItem) {
-            // Only insert if button doesn't already exist
-            if (!lastListItem.querySelector('.sbp-email-button')) {
-                lastListItem.innerHTML = '';
-                lastListItem.appendChild(btn);
-                Object.assign(lastListItem.style, {
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                });
-            }
+            if (lastListItem.querySelector('.sbp-email-button')) return true;
+            lastListItem.innerHTML = '';
+            lastListItem.appendChild(btn);
+            Object.assign(lastListItem.style, {
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+            });
             return true;
         }
         return false;
     }
+
     // 🔹 Main init
     function initializeScript() {
         const btn = createButton();
+
         btn.addEventListener("click", () => {
             let montant = getTotalRegle();
             const inputData = extractInputData();
             const activeTabContent = getActiveTabContent();
             if (!activeTabContent) return;
+
             const affaireDivs = activeTabContent.querySelectorAll('div.edit-delta-pad');
             affaireDivs.forEach(div => {
                 const numElement = div.querySelector('div.s_dn');
                 if (!numElement) return;
                 const numeroAffaire = numElement.textContent.trim();
                 if (!/^([A-Z]{2})-\d+$/.test(numeroAffaire)) return;
+
                 let toEmail = '', ccEmail = '';
                 const prefix = numeroAffaire.split('-')[0];
                 switch(prefix) {
@@ -105,9 +112,11 @@
                     default:
                         return;
                 }
+
                 let subjectMontant = montant ? ` - ${montant} DH` : '';
                 let subject = encodeURIComponent(`Encaissement - ${numeroAffaire}${subjectMontant}`);
                 let bodyText = `Bonjour,\n\n`;
+
                 if (montant) {
                     bodyText += `Je vous informe que l'encaissement relatif à l'affaire ${numeroAffaire} d'un montant de ${montant} DH a bien été intégré dans la fiche dédiée.\n\n`;
                 } else {
@@ -117,25 +126,17 @@
                     bodyText += `Référence affaire : ${inputData.value}\n\n`;
                 }
                 bodyText += "Cordialement,";
+
                 let mailtoLink = `mailto:${toEmail}?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
                 if (ccEmail) mailtoLink += `&cc=${ccEmail}`;
                 window.open(mailtoLink);
             });
         });
-        // 🔹 Continuous button check
-        function ensureButton() {
-            const existingButton = document.querySelector('.sbp-email-button');
-            if (!existingButton) {
-                // Create a new button instance if none exists
-                const newBtn = createButton();
-                newBtn.addEventListener("click", btn.click); // Copy click handler
-                insertButton(newBtn);
-            }
-        }
-        // Initial insertion attempt
-        insertButton(btn);
-        // Continuously check every 500ms to ensure button presence
-        setInterval(ensureButton, 500);
+
+        const interval = setInterval(() => {
+            if (insertButton(btn)) clearInterval(interval);
+        }, 500);
     }
+
     initializeScript();
 })();
