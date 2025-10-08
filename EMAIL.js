@@ -57,29 +57,8 @@
         return btn;
     }
 
-    // 🔹 Insert button in toolbar
-    function insertButton(btn) {
-        const toolbar = document.querySelector('div.sp-fstd-black.s_pa.sp-toolbar-ext ul.sp-toolbar');
-        if (!toolbar) return false;
-        const lastListItem = toolbar.querySelector('li:last-child');
-        if (lastListItem) {
-            if (lastListItem.querySelector('.sbp-email-button')) return true;
-            lastListItem.innerHTML = '';
-            lastListItem.appendChild(btn);
-            Object.assign(lastListItem.style, {
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center'
-            });
-            return true;
-        }
-        return false;
-    }
-
-    // 🔹 Main init
-    function initializeScript() {
-        const btn = createButton();
-
+    // 🔹 Add click handler
+    function addClickHandler(btn) {
         btn.addEventListener("click", () => {
             let montant = getTotalRegle();
             const inputData = extractInputData();
@@ -132,9 +111,32 @@
                 window.open(mailtoLink);
             });
         });
+    }
 
-        const interval = setInterval(() => {
-            if (insertButton(btn)) clearInterval(interval);
+    // 🔹 Insert button in toolbar
+    function insertButton(btn) {
+        const toolbar = document.querySelector('div.sp-fstd-black.s_pa.sp-toolbar-ext ul.sp-toolbar');
+        if (!toolbar) return false;
+        if (toolbar.querySelector('.sbp-email-button')) return true;
+        const newLi = document.createElement('li');
+        newLi.appendChild(btn);
+        Object.assign(newLi.style, {
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+        });
+        toolbar.appendChild(newLi);
+        return true;
+    }
+
+    // 🔹 Main init
+    function initializeScript() {
+        setInterval(() => {
+            const toolbar = document.querySelector('div.sp-fstd-black.s_pa.sp-toolbar-ext ul.sp-toolbar');
+            if (!toolbar || toolbar.querySelector('.sbp-email-button')) return;
+            const btn = createButton();
+            addClickHandler(btn);
+            insertButton(btn);
         }, 500);
     }
 
