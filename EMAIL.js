@@ -102,7 +102,7 @@
                     bodyText += `Je vous informe que l'encaissement relatif à l'affaire ${numeroAffaire} a bien été intégré dans la fiche dédiée\n\n`;
                 }
                 if (inputData?.value) {
-                    bodyText += `Référence affaire : ${inputData.value}\n\n`;
+                    bodyText += `Référence de la fiche d’affaire : ${inputData.value}\n\n`;
                 }
                 bodyText += "Cordialement,";
 
